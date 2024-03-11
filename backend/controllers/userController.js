@@ -198,11 +198,58 @@ exports.getSingleUser = catchAsyncError(async (req, res, next) => {
   const user = await User.findById(req.params.id);
 
   if (!user) {
-    return next(new ErrorHander(`User does not exist with id: ${req.params.id}`));
+    return next(
+      new ErrorHander(`User does not exist with id: ${req.params.id}`)
+    );
   }
 
   res.status(200).json({
     success: true,
     user,
   });
+});
+
+// Update User Role -- Admin
+exports.updateUserRole = catchAsyncError(async (req, res, next) => {
+  const newUserData = {
+    name: req.body.name,
+    email: req.body.email,
+    role: req.body.role,
+  };
+
+  const user = await User.findByIdAndUpdate(req.params.id, newUserData, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+
+  if (!user) {
+    return next(
+      new ErrorHander(`User does not exist with id  : ${req.params.id}`)
+    );
+  }
+
+  res.status(200).json({
+    success: true,
+  });
+});
+
+// Update User Role -- Admin
+exports.deleteUser = catchAsyncError(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  // we will remove cloudinary later
+
+  if (!user) {
+    return next(
+      new ErrorHander(`User does not exist with id  : ${req.params.id}`)
+    );
+  }
+// I have used deleteOne instead of remove
+  await user.deleteOne();
+
+  res.status(200).json({
+    success:true,
+    message:"User Deleted Succeessfully"
+  })
 });
